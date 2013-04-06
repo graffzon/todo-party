@@ -45,8 +45,9 @@
     
     // If appropriate, configure the new managed object.
     // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
+    [newManagedObject setValue:_taskTitleInput.text forKey:@"title"];
     [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-    
+
     // Save the context.
     NSError *error = nil;
     if (![context save:&error]) {
@@ -105,14 +106,39 @@
     return NO;
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([[segue identifier] isEqualToString:@"showDetail"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        [[segue destinationViewController] setDetailItem:object];
+    NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+//    
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"No network connection"
+//                                                    message: [[object valueForKey:@"done"] description]
+//                                                   delegate:nil
+//                                          cancelButtonTitle:@"OK"
+//                                          otherButtonTitles:nil];
+//    [alert show];
+//    
+    if ([object valueForKey:@"done"]) {
+        [object setValue:[NSNumber numberWithBool:NO] forKey:@"done"];
+    } else {
+        [object setValue:[NSNumber numberWithBool:YES] forKey:@"done"];
     }
+//
+//    UIAlertView *newalert = [[UIAlertView alloc] initWithTitle:@"No network connection"
+//                                                    message: [[object valueForKey:@"done"] description]
+//                                                   delegate:nil
+//                                          cancelButtonTitle:@"OK"
+//                                          otherButtonTitles:nil];
+//    [newalert show];
 }
+
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+//{
+//    if ([[segue identifier] isEqualToString:@"showDetail"]) {
+//        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+//        NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+//        [[segue destinationViewController] setDetailItem:object];
+//    }
+//}
 
 #pragma mark - Fetched results controller
 
@@ -124,7 +150,7 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Task" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -216,7 +242,7 @@
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[object valueForKey:@"timeStamp"] description];
+    cell.textLabel.text = [[object valueForKey:@"done"] description];//[[object valueForKey:@"title"] description];
 }
 
 @end
